@@ -5,9 +5,13 @@ import java.sql.Timestamp;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
 
 /**
  * The persistent class for the salesterritoryhistory database table.
@@ -18,9 +22,13 @@ import javax.persistence.NamedQuery;
 public class Salesterritoryhistory implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	private SalesterritoryhistoryPK id;
-
+//	@EmbeddedId
+//	private SalesterritoryhistoryPK id;
+	@Id
+	@SequenceGenerator(name = "SALESTERRITORYHISTORY_ID_GENERATOR", allocationSize = 1, sequenceName = "SALESTERRITORYHISTORY_SEQ")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SALESTERRITORYHISTORY_ID_GENERATOR")
+	private Integer id;
+	
 	private Timestamp enddate;
 
 	private Timestamp modifieddate;
@@ -44,7 +52,11 @@ public class Salesterritoryhistory implements Serializable {
 		return this.enddate;
 	}
 
-	public SalesterritoryhistoryPK getId() {
+//	public SalesterritoryhistoryPK getId() {
+//		return this.id;
+//	}
+	
+	public Integer getId() {
 		return this.id;
 	}
 
@@ -68,10 +80,14 @@ public class Salesterritoryhistory implements Serializable {
 		this.enddate = enddate;
 	}
 
-	public void setId(SalesterritoryhistoryPK id) {
+//	public void setId(SalesterritoryhistoryPK id) {
+//		this.id = id;
+//	}
+	
+	public void setId(Integer id) {
 		this.id = id;
 	}
-
+	
 	public void setModifieddate(Timestamp modifieddate) {
 		this.modifieddate = modifieddate;
 	}

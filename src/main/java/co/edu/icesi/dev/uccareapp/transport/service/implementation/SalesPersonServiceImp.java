@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import co.edu.icesi.dev.uccareapp.transport.customexeptions.NumericInvalidValueException;
+import co.edu.icesi.dev.uccareapp.transport.customexeptions.InvalidValueException;
 import co.edu.icesi.dev.uccareapp.transport.model.sales.Salesperson;
 import co.edu.icesi.dev.uccareapp.transport.repository.SalesPersonRepository;
 import co.edu.icesi.dev.uccareapp.transport.service.interfaces.SalesPersonService;
@@ -20,41 +20,41 @@ public class SalesPersonServiceImp implements SalesPersonService {
 	}
 
 	@Override
-	public Optional<Salesperson> findById(Integer id) {
-	
-		return this.salesPersonRepository.findById(id);
-	}
-
-	@Override
-	public void add(Salesperson salesPerson) throws NumericInvalidValueException {
+	public void add(Salesperson salesPerson) throws InvalidValueException {
 		Optional<Salesperson> person = findById(salesPerson.getBusinessentityid());
 		if(person.isEmpty()) {
 			if(salesPerson.getSalesquota().compareTo(BigDecimal.ZERO)<0) {
-				throw new NumericInvalidValueException();
+				throw new InvalidValueException();
 			}
 			if(salesPerson.getCommissionpct().compareTo(BigDecimal.ZERO)<0) {
-				throw new NumericInvalidValueException();
+				throw new InvalidValueException();
 			}
 			if(salesPerson.getCommissionpct().compareTo(BigDecimal.ONE)>0) {
-				throw new NumericInvalidValueException();
+				throw new InvalidValueException();
 			}
 		}
 		
 	}
 
 	@Override
-	public void edit(Salesperson salesPerson) throws NumericInvalidValueException{
+	public void edit(Salesperson salesPerson) throws InvalidValueException{
 		if(salesPerson.getSalesquota().compareTo(BigDecimal.ZERO)<0) {
-			throw new NumericInvalidValueException();
+			throw new InvalidValueException();
 		}
 		if(salesPerson.getCommissionpct().compareTo(BigDecimal.ZERO)<0) {
-			throw new NumericInvalidValueException();
+			throw new InvalidValueException();
 		}
 		if(salesPerson.getCommissionpct().compareTo(BigDecimal.ONE)>0) {
-			throw new NumericInvalidValueException();
+			throw new InvalidValueException();
 		}
 	}
 
+	@Override
+	public Optional<Salesperson> findById(Integer id) {
+	
+		return this.salesPersonRepository.findById(id);
+	}
+	
 	@Override
 	public Iterable<Salesperson> findAll() {
 		// TODO Auto-generated method stub

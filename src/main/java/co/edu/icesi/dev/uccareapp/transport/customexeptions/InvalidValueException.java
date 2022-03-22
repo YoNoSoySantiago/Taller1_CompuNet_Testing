@@ -3,8 +3,11 @@ package co.edu.icesi.dev.uccareapp.transport.customexeptions;
 import java.security.InvalidAlgorithmParameterException;
 
 @SuppressWarnings("serial")
-public class NumericInvalidValueException extends InvalidAlgorithmParameterException{
-	public NumericInvalidValueException() {
+public class InvalidValueException extends InvalidAlgorithmParameterException{
+	public InvalidValueException() {
 		super("The value is not allowed here, please edit and try again");
+	}
+	public InvalidValueException(String message) {
+		super(message);
 	}
 }

@@ -6,9 +6,13 @@ import java.sql.Timestamp;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
 
 /**
  * The persistent class for the salespersonquotahistory database table.
@@ -19,9 +23,13 @@ import javax.persistence.NamedQuery;
 public class Salespersonquotahistory implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	private SalespersonquotahistoryPK id;
-
+//	@EmbeddedId
+//	private SalespersonquotahistoryPK id;
+	@Id
+	@SequenceGenerator(name = "SALESPERSONQUOTAHISTORY_ID_GENERATOR", allocationSize = 1, sequenceName = "SALESPERSONQUOTAHISTORY_SEQ")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SALESPERSONQUOTAHISTORY_ID_GENERATOR")
+	private Integer id;
+	
 	private Timestamp modifieddate;
 
 	private Integer rowguid;
@@ -36,7 +44,11 @@ public class Salespersonquotahistory implements Serializable {
 	public Salespersonquotahistory() {
 	}
 
-	public SalespersonquotahistoryPK getId() {
+//	public SalespersonquotahistoryPK getId() {
+//		return this.id;
+//	}
+	
+	public Integer getId() {
 		return this.id;
 	}
 
@@ -56,7 +68,10 @@ public class Salespersonquotahistory implements Serializable {
 		return this.salesquota;
 	}
 
-	public void setId(SalespersonquotahistoryPK id) {
+//	public void setId(SalespersonquotahistoryPK id) {
+//		this.id = id;
+//	}
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
