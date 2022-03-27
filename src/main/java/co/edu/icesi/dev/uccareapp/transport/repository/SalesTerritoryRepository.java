@@ -1,7 +1,10 @@
 package co.edu.icesi.dev.uccareapp.transport.repository;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface SalesTerritoryRepository<Salesterritory,Integer> extends CrudRepository<Salesterritory, Integer> {
+import co.edu.icesi.dev.uccareapp.transport.model.sales.Salesterritory;
+
+public interface SalesTerritoryRepository extends CrudRepository<Salesterritory, Integer> {
 
 }
