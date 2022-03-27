@@ -20,8 +20,8 @@ import org.mockito.quality.Strictness;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
+import co.edu.icesi.dev.uccareapp.transport.Taller1ShApplication;
 import co.edu.icesi.dev.uccareapp.transport.customexeptions.InvalidValueException;
-import co.edu.icesi.dev.uccareapp.transport.demo.Taller1ShApplication;
 import co.edu.icesi.dev.uccareapp.transport.model.person.Businessentity;
 import co.edu.icesi.dev.uccareapp.transport.model.person.Countryregion;
 import co.edu.icesi.dev.uccareapp.transport.model.sales.Salesperson;

@@ -6,10 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 
+import co.edu.icesi.dev.uccareapp.transport.Taller1ShApplication;
 import co.edu.icesi.dev.uccareapp.transport.customexeptions.InvalidValueException;
 import co.edu.icesi.dev.uccareapp.transport.customexeptions.ObjectDoesNotExistException;
-import co.edu.icesi.dev.uccareapp.transport.demo.Taller1ShApplication;
 import co.edu.icesi.dev.uccareapp.transport.model.person.Businessentity;
 import co.edu.icesi.dev.uccareapp.transport.model.person.Countryregion;
 import co.edu.icesi.dev.uccareapp.transport.model.sales.Salesterritory;
@@ -20,7 +21,8 @@ import co.edu.icesi.dev.uccareapp.transport.service.interfaces.SalesPersonServic
 import co.edu.icesi.dev.uccareapp.transport.service.interfaces.SalesTerritoryHistoryService;
 import co.edu.icesi.dev.uccareapp.transport.service.interfaces.SalesTerritoryService;
 
-@SpringBootTest(classes = Taller1ShApplication.class)
+@SpringBootTest
+@ContextConfiguration(classes = Taller1ShApplication.class)
 class Taller1ShApplicationIntegrationTest {
 	
 	

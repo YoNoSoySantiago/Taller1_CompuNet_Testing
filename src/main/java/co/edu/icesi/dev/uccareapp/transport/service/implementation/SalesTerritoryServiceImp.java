@@ -16,7 +16,7 @@ import co.edu.icesi.dev.uccareapp.transport.service.interfaces.SalesTerritorySer
 public class SalesTerritoryServiceImp implements SalesTerritoryService {
 	
 	private SalesTerritoryRepository salesTerritoryRespository;
-	CountryRegionRepository<Countryregion, String> countryRegionRegpository;
+	CountryRegionRepository countryRegionRegpository;
 	@Autowired
 	public SalesTerritoryServiceImp(SalesTerritoryRepository str,CountryRegionRepository crr) {
 		this.salesTerritoryRespository = str;

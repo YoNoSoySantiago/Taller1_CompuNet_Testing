@@ -12,10 +12,10 @@ import co.edu.icesi.dev.uccareapp.transport.service.interfaces.CountryRegionServ
 @Service
 public class CountryRegionServiceImp implements CountryRegionService {
 	
-	private CountryRegionRepository<Countryregion, String> countryRegionRepository;
+	private CountryRegionRepository countryRegionRepository;
 	
 	@Autowired
-	public CountryRegionServiceImp(CountryRegionRepository<Countryregion, String> crr) {
+	public CountryRegionServiceImp(CountryRegionRepository crr) {
 		countryRegionRepository = crr;
 	}
 	@Override

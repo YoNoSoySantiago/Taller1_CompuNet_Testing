@@ -54,7 +54,6 @@ public class SalesPersonServiceImp implements SalesPersonService {
 		}else {
 			throw new ObjectAlreadyExistException("this id already exist");
 		}
-		
 	}
 
 	@Override

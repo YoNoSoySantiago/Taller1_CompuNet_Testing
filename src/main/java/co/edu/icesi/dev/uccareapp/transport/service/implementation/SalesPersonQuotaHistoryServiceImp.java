@@ -17,10 +17,10 @@ import co.edu.icesi.dev.uccareapp.transport.service.interfaces.SalesPersonQuotaH
 @Service
 public class SalesPersonQuotaHistoryServiceImp implements SalesPersonQuotaHistoryService {
 	
-	private SalesPersonQuotaHistoryRepository<Salespersonquotahistory,Integer> salesPersonQuotaHistoryRepository;
+	private SalesPersonQuotaHistoryRepository salesPersonQuotaHistoryRepository;
 	
 	@Autowired
-	public SalesPersonQuotaHistoryServiceImp(SalesPersonQuotaHistoryRepository<Salespersonquotahistory, Integer> spqhr) {
+	public SalesPersonQuotaHistoryServiceImp(SalesPersonQuotaHistoryRepository spqhr) {
 		this.salesPersonQuotaHistoryRepository = spqhr;
 	}
 
