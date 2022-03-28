@@ -10,9 +10,11 @@ import co.edu.icesi.dev.uccareapp.transport.customexeptions.ObjectDoesNotExistEx
 import co.edu.icesi.dev.uccareapp.transport.model.sales.Salespersonquotahistory;
 public interface SalesPersonQuotaHistoryService {
 	
-	public void add(Salespersonquotahistory salesPersonQuotaHistoryService) throws InvalidValueException, ObjectAlreadyExistException;
+	public void add(Salespersonquotahistory salesPersonQuotaHistoryService, Integer idSalesPerson) throws InvalidValueException, ObjectAlreadyExistException, ObjectDoesNotExistException;
 	public void edit(Salespersonquotahistory salesPersonQuotaHistoryService) throws InvalidValueException, ObjectDoesNotExistException;
 
 	public Optional<Salespersonquotahistory> findById(Integer id);
 	public Iterable<Salespersonquotahistory> findAll();
+	
+	public void clear();
 }

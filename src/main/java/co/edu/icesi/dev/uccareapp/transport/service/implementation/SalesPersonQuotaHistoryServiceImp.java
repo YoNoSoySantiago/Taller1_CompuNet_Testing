@@ -11,21 +11,26 @@ import org.springframework.stereotype.Service;
 import co.edu.icesi.dev.uccareapp.transport.customexeptions.InvalidValueException;
 import co.edu.icesi.dev.uccareapp.transport.customexeptions.ObjectAlreadyExistException;
 import co.edu.icesi.dev.uccareapp.transport.customexeptions.ObjectDoesNotExistException;
+import co.edu.icesi.dev.uccareapp.transport.model.person.Businessentity;
+import co.edu.icesi.dev.uccareapp.transport.model.sales.Salesperson;
 import co.edu.icesi.dev.uccareapp.transport.model.sales.Salespersonquotahistory;
 import co.edu.icesi.dev.uccareapp.transport.repository.SalesPersonQuotaHistoryRepository;
+import co.edu.icesi.dev.uccareapp.transport.repository.SalesPersonRepository;
 import co.edu.icesi.dev.uccareapp.transport.service.interfaces.SalesPersonQuotaHistoryService;
 @Service
 public class SalesPersonQuotaHistoryServiceImp implements SalesPersonQuotaHistoryService {
 	
 	private SalesPersonQuotaHistoryRepository salesPersonQuotaHistoryRepository;
+	private SalesPersonRepository salesPersonRepository;
 	
 	@Autowired
-	public SalesPersonQuotaHistoryServiceImp(SalesPersonQuotaHistoryRepository spqhr) {
+	public SalesPersonQuotaHistoryServiceImp(SalesPersonQuotaHistoryRepository spqhr, SalesPersonRepository spr) {
+		this.salesPersonRepository = spr;
 		this.salesPersonQuotaHistoryRepository = spqhr;
 	}
 
 	@Override
-	public void add(Salespersonquotahistory salesPersonQuotaHistory) throws InvalidValueException, ObjectAlreadyExistException {
+	public void add(Salespersonquotahistory salesPersonQuotaHistory, Integer idSalesPerson) throws InvalidValueException, ObjectAlreadyExistException, ObjectDoesNotExistException {
 		if(
 			salesPersonQuotaHistory.getId()==null||
 			salesPersonQuotaHistory.getModifieddate()==null||
@@ -41,6 +46,13 @@ public class SalesPersonQuotaHistoryServiceImp implements SalesPersonQuotaHistor
 			if(salesPersonQuotaHistory.getSalesquota().compareTo(BigDecimal.ZERO)<0) {
 				throw new InvalidValueException("The sales quota must to be a positive number");
 			}
+			
+			Optional<Salesperson> OpSalesPerson = salesPersonRepository.findById(idSalesPerson);
+			if(OpSalesPerson.isEmpty()) {
+				throw new ObjectDoesNotExistException("This id of businessentity does not exist");
+			}
+			salesPersonQuotaHistory.setSalesperson(OpSalesPerson.get());
+			this.salesPersonQuotaHistoryRepository.save(salesPersonQuotaHistory);
 		}else {
 			throw new ObjectAlreadyExistException("This id already exist");
 		}
@@ -63,6 +75,11 @@ public class SalesPersonQuotaHistoryServiceImp implements SalesPersonQuotaHistor
 			if(salesPersonQuotaHistory.getSalesquota().compareTo(BigDecimal.ZERO)<0) {
 				throw new InvalidValueException("The sales quota must to be a positive number");
 			}
+			
+			Salespersonquotahistory oldHistory = quotaHistory.get();
+			oldHistory.setModifieddate(salesPersonQuotaHistory.getModifieddate());
+			oldHistory.setSalesquota(salesPersonQuotaHistory.getSalesquota());
+			this.salesPersonQuotaHistoryRepository.save(oldHistory);
 		}else {
 			throw new ObjectDoesNotExistException("This id does not exist");
 		}
@@ -78,6 +95,12 @@ public class SalesPersonQuotaHistoryServiceImp implements SalesPersonQuotaHistor
 	public Iterable<Salespersonquotahistory> findAll() {
 		
 		return this.salesPersonQuotaHistoryRepository.findAll();
+	}
+
+	@Override
+	public void clear() {
+		
+		this.salesPersonQuotaHistoryRepository.deleteAll();
 	}
 
 }

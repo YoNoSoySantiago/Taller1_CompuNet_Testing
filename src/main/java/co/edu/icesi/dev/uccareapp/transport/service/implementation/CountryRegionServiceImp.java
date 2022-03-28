@@ -27,5 +27,14 @@ public class CountryRegionServiceImp implements CountryRegionService {
 	public Optional<Countryregion> findById(String coruntryCode) {
 		return this.countryRegionRepository.findById(coruntryCode);
 	}
+	@Override
+	public Iterable<Countryregion> findAll() {
+		
+		return this.countryRegionRepository.findAll();
+	}
+	@Override
+	public void clear() {
+		this.countryRegionRepository.deleteAll();
+	}
 
 }

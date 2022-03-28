@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import co.edu.icesi.dev.uccareapp.transport.customexeptions.InvalidValueException;
 import co.edu.icesi.dev.uccareapp.transport.customexeptions.ObjectAlreadyExistException;
 import co.edu.icesi.dev.uccareapp.transport.customexeptions.ObjectDoesNotExistException;
+import co.edu.icesi.dev.uccareapp.transport.model.person.Businessentity;
 import co.edu.icesi.dev.uccareapp.transport.model.sales.Salesperson;
+import co.edu.icesi.dev.uccareapp.transport.model.sales.Salesterritory;
 import co.edu.icesi.dev.uccareapp.transport.repository.BusinessentityRepository;
 import co.edu.icesi.dev.uccareapp.transport.repository.SalesPersonRepository;
 import co.edu.icesi.dev.uccareapp.transport.repository.SalesTerritoryRepository;
@@ -32,15 +34,17 @@ public class SalesPersonServiceImp implements SalesPersonService {
 	}
 
 	@Override
-	public void add(Salesperson salesPerson) throws InvalidValueException, ObjectAlreadyExistException {
-		if(salesPerson.getBusinessentityid()==null||
-		salesPerson.getSalesterritory()==null||
+	public void add(Salesperson salesPerson,Integer BusinessId,Integer territoryId) throws InvalidValueException, ObjectAlreadyExistException, ObjectDoesNotExistException {
+		if(
 		salesPerson.getSalesquota() == null ||
-		salesPerson.getCommissionpct() == null) {
+		salesPerson.getCommissionpct() == null ||
+		BusinessId == null ||
+		territoryId == null
+		) {
 			throw new NullPointerException("Empty values or nulls");
 		}
 		
-		Optional<Salesperson> person = findById(salesPerson.getBusinessentityid());
+		Optional<Salesperson> person = findById(BusinessId);
 		if(person.isEmpty()) {
 			if(salesPerson.getSalesquota().compareTo(BigDecimal.ZERO)<0) {
 				throw new InvalidValueException("sales quota must be a positive number");
@@ -51,6 +55,20 @@ public class SalesPersonServiceImp implements SalesPersonService {
 			if(salesPerson.getCommissionpct().compareTo(BigDecimal.ONE)>0) {
 				throw new InvalidValueException("commission must to be between 0 and 1");
 			}
+			
+			Optional<Businessentity> entity = businessentityRepository.findById(BusinessId);
+			if(entity.isEmpty()) {
+				throw new ObjectDoesNotExistException("This id of businessentity does not exist");
+			}
+			
+			Optional<Salesterritory> territory = salesTerritoryRepository.findById(territoryId);
+			if(territory.isEmpty()) {
+				throw new ObjectDoesNotExistException("This id of a Territory does not exist");
+			}
+			salesPerson.setBusinessentityid(BusinessId);
+			salesPerson.setSalesterritory(territory.get());
+			this.salesPersonRepository.save(salesPerson);
+			
 		}else {
 			throw new ObjectAlreadyExistException("this id already exist");
 		}
@@ -58,14 +76,14 @@ public class SalesPersonServiceImp implements SalesPersonService {
 
 	@Override
 	public void edit(Salesperson salesPerson) throws InvalidValueException, ObjectDoesNotExistException{
-		if(salesPerson.getBusinessentityid()==null||
+		if(
+		salesPerson.getBusinessentityid()==null||
 		salesPerson.getSalesterritory()==null||
 		salesPerson.getSalesquota() == null ||
 		salesPerson.getCommissionpct() == null) {
 			throw new NullPointerException("Empty values or nulls");
 		}
-		Optional<Salesperson> person = findById(1234);
-		System.out.println(person);
+		Optional<Salesperson> person = findById(salesPerson.getBusinessentityid());
 		if(!person.isEmpty()) {
 			if(salesPerson.getSalesquota().compareTo(BigDecimal.ZERO)<0) {
 				throw new InvalidValueException("sales quota must be a positive number");
@@ -76,6 +94,11 @@ public class SalesPersonServiceImp implements SalesPersonService {
 			if(salesPerson.getCommissionpct().compareTo(BigDecimal.ONE)>0) {
 				throw new InvalidValueException("commission must to be between 0 and 1");
 			}
+			Salesperson oldPerson = person.get();
+			oldPerson.setCommissionpct(salesPerson.getCommissionpct());
+			oldPerson.setSalesquota(salesPerson.getSalesquota());
+			
+			this.salesPersonRepository.save(oldPerson);
 		}else {
 			throw new ObjectDoesNotExistException("this id does not exist");
 		}
@@ -89,5 +112,11 @@ public class SalesPersonServiceImp implements SalesPersonService {
 	@Override
 	public Iterable<Salesperson> findAll() {
 		return this.salesPersonRepository.findAll();
+	}
+
+	@Override
+	public void clear() {
+		
+		this.salesPersonRepository.deleteAll();
 	}
 }

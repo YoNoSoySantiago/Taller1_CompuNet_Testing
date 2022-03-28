@@ -14,4 +14,6 @@ public interface SalesTerritoryService {
 
 	public Optional<Salesterritory> findById(Integer id);
 	public Iterable<Salesterritory> findAll();
+	
+	public void clear();
 }

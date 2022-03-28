@@ -16,7 +16,8 @@ import co.edu.icesi.dev.uccareapp.transport.service.interfaces.SalesTerritorySer
 public class SalesTerritoryServiceImp implements SalesTerritoryService {
 	
 	private SalesTerritoryRepository salesTerritoryRespository;
-	CountryRegionRepository countryRegionRegpository;
+	private CountryRegionRepository countryRegionRegpository;
+	
 	@Autowired
 	public SalesTerritoryServiceImp(SalesTerritoryRepository str,CountryRegionRepository crr) {
 		this.salesTerritoryRespository = str;
@@ -35,6 +36,7 @@ public class SalesTerritoryServiceImp implements SalesTerritoryService {
 			if(salesTerritory.getName().length()<5) {
 				throw new InvalidValueException("The lenght of the name must to be al least 5");
 			}
+			this.salesTerritoryRespository.save(salesTerritory);
 		}else {
 			throw new ObjectDoesNotExistException("This region code, does not exist");
 		}
@@ -45,15 +47,24 @@ public class SalesTerritoryServiceImp implements SalesTerritoryService {
 	public void edit(Salesterritory salesTerritory) throws InvalidValueException, ObjectDoesNotExistException {
 		if(
 				salesTerritory.getName()==null ||
-				salesTerritory.getCountryregioncode()==null
+				salesTerritory.getCountryregioncode()==null ||
+				salesTerritory.getTerritoryid() == null
 				) {
 				throw new NullPointerException("Values empties or null");
 			}
 		Optional<Countryregion> countryCode = this.countryRegionRegpository.findById(salesTerritory.getCountryregioncode());
 		if(!countryCode.isEmpty()) {
+			Optional<Salesterritory> optTerritory = findById(salesTerritory.getTerritoryid());
+			if(optTerritory.isEmpty()) {
+				throw new ObjectDoesNotExistException("Not exist a Sales Territory with this ID");
+			}
 			if(salesTerritory.getName().length()<5) {
 				throw new InvalidValueException("The lenght of the name must to be al least 5");
 			}
+			Salesterritory oldSalesTerritory = optTerritory.get();
+			oldSalesTerritory.setName(salesTerritory.getName());
+			oldSalesTerritory.setCountryregioncode(salesTerritory.getCountryregioncode());
+			this.salesTerritoryRespository.save(oldSalesTerritory);
 		}else {
 			throw new ObjectDoesNotExistException("This region code, does not exist");
 		}
@@ -67,6 +78,10 @@ public class SalesTerritoryServiceImp implements SalesTerritoryService {
 	@Override
 	public Iterable<Salesterritory> findAll() {
 		return this.salesTerritoryRespository.findAll();
+	}
+	@Override
+	public void clear() {
+		this.salesTerritoryRespository.deleteAll();
 	}
 
 }

@@ -12,6 +12,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 
+import org.hibernate.annotations.GenericGenerator;
+
 /**
  * The persistent class for the countryregion database table.
  *
@@ -24,6 +26,7 @@ public class Countryregion implements Serializable {
 	@Id
 	@SequenceGenerator(name = "COUNTRYREGION_COUNTRYREGIONCODE_GENERATOR", allocationSize = 1, sequenceName = "COUNTRYREGION_SEQ")
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "COUNTRYREGION_COUNTRYREGIONCODE_GENERATOR")
+	@GenericGenerator(name="COUNTRYREGION_COUNTRYREGIONCODE_GENERATOR", strategy = "uuid")
 	private String countryregioncode;
 
 	private Timestamp modifieddate;

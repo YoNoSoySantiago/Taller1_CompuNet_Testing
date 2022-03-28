@@ -13,6 +13,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -72,11 +74,7 @@ class Taller1ShApplicationUnitTests {
 	@Mock
 	private BusinessentityRepository businessentityRepository;
 	
-//	@BeforeAll
-//	void loadMocks() {
-//		doReturn(4321).when(salesTerritory).getTerritoryid();
-//		doReturn(1234).when(businessEntity).getBusinessentityid();
-//	}
+
 	void setUpIdValues(){
 		Optional<Salesperson> opPerson =  Optional.of(new Salesperson());
 		Optional<Salesterritory> opTerritory = Optional.of(new Salesterritory());
@@ -93,380 +91,682 @@ class Taller1ShApplicationUnitTests {
 		when(salesTerritoryRepository.findById(4321)).thenReturn(Optional.empty());
 		when(salesPersonQuotaHistoryRepository.findById(1234)).thenReturn(Optional.empty());
 		when(salesTerritoryHistoryRepository.findById(1234)).thenReturn(Optional.empty());
-		
 	}
 
 	
 	@BeforeEach
 	void loadService() {
 		salesPersonService = new SalesPersonServiceImp(salesPersonRepository,businessentityRepository,salesTerritoryRepository);
-		salesPersonQuotaHistoryService = new SalesPersonQuotaHistoryServiceImp(salesPersonQuotaHistoryRepository);
+		salesPersonQuotaHistoryService = new SalesPersonQuotaHistoryServiceImp(salesPersonQuotaHistoryRepository,salesPersonRepository);
 		salesTerritoryService = new SalesTerritoryServiceImp(salesTerritoryRepository,countryRegionRepository);
-		salesTerritoryHistoryService = new SalesTerritoryHistoryServiceImp(salesTerritoryHistoryRepository, salesTerritoryRepository);
+		salesTerritoryHistoryService = new SalesTerritoryHistoryServiceImp(salesTerritoryHistoryRepository, salesTerritoryRepository,salesPersonRepository);
 		Optional<Countryregion> opCountry = Optional.of(new Countryregion());
+		Optional<Businessentity> opBusinessEntity = Optional.of(new Businessentity());
 		when(countryRegionRepository.findById("COL")).thenReturn(opCountry);
 		when(salesTerritory.getName()).thenReturn("TR-SH");
 		when(salesTerritory.getCountryregioncode()).thenReturn("COL");
 		when(salesTerritory.getTerritoryid()).thenReturn(4321);
-	}
-	@Test
-	void saveSalesPersonTest() {
-		setUpEmptyIdValues();
-		Salesperson person = new Salesperson();
-		person.setBusinessentityid(1234);
-		person.setSalesterritory(salesTerritory);
-		person.setSalesquota(new BigDecimal("-0.9999"));
-		person.setCommissionpct(new BigDecimal("0.5"));
-		
-		assertThrows(InvalidValueException.class, ()->{
-			salesPersonService.add(person);
-		});
-		
-		person.setSalesquota(new BigDecimal("99999.99999"));
-		person.setCommissionpct(new BigDecimal("-0.999"));
-		
-		assertThrows(InvalidValueException.class, ()->{
-			salesPersonService.add(person);
-		});
-		
-		person.setCommissionpct(new BigDecimal("1.001"));
-		
-		assertThrows(InvalidValueException.class, ()->{
-			salesPersonService.add(person);
-		});
-		
-		person.setCommissionpct(new BigDecimal("1"));
-		assertDoesNotThrow(()->{
-			salesPersonService.add(person);
-		});
-		person.setCommissionpct(new BigDecimal("0"));
-		assertDoesNotThrow(()->{
-			salesPersonService.add(person);
-		});
-		
-		person.setBusinessentityid(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonService.add(person);
-		});
-		
-		person.setSalesterritory(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonService.add(person);
-		});
-		
-		person.setSalesquota(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonService.add(person);
-		});
-		
-		person.setCommissionpct(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonService.add(person);
-		});
+		when(businessentityRepository.findById(1234)).thenReturn(opBusinessEntity);
 	}
 	
-	
-	@Test
-	void editSalesPersonTest() {
-		setUpIdValues();
-		Salesperson person = new Salesperson();
-		person.setBusinessentityid(1234);
-		person.setSalesterritory(salesTerritory);
-		person.setSalesquota(new BigDecimal("-0.9999"));
-		person.setCommissionpct(new BigDecimal("0.5"));
-		
-		assertThrows(InvalidValueException.class, ()->{
-			salesPersonService.edit(person);
-		});
-		
-		person.setSalesquota(new BigDecimal("99999.99999"));
-		person.setCommissionpct(new BigDecimal("-0.999"));
-		
-		assertThrows(InvalidValueException.class, ()->{
-			salesPersonService.edit(person);
-		});
-		
-		person.setCommissionpct(new BigDecimal("1.001"));
-		
-		assertThrows(InvalidValueException.class, ()->{
-			salesPersonService.edit(person);
-		});
-		
-		person.setCommissionpct(new BigDecimal("1"));
-		assertDoesNotThrow(()->{
-			salesPersonService.edit(person);
-		});
-		
-		person.setCommissionpct(new BigDecimal("0"));
-		assertDoesNotThrow(()->{
-			salesPersonService.edit(person);
-		});
-		
-		person.setBusinessentityid(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonService.edit(person);
-		});
-		
-		person.setSalesterritory(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonService.edit(person);
-		});
-		
-		person.setSalesquota(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonService.edit(person);
-		});
-		
-		person.setCommissionpct(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonService.edit(person);
-		});
-	}
-	
-	@Test
-	void saveSalesQuotaHistoryTest() {
-		setUpEmptyIdValues();
-		Salespersonquotahistory salesQuota = new Salespersonquotahistory();
-		salesQuota.setId(1234);
-		salesQuota.setModifieddate(Timestamp.valueOf(LocalDateTime.now().plusDays(1)));
-		salesQuota.setSalesquota(BigDecimal.ZERO);
-		assertThrows(InvalidValueException.class, ()->{
-			salesPersonQuotaHistoryService.add(salesQuota);
-		});
-		salesQuota.setModifieddate(Timestamp.valueOf(LocalDateTime.now()));
-		salesQuota.setSalesquota(new BigDecimal("-0.99"));
-		assertThrows(InvalidValueException.class, ()->{
-			salesPersonQuotaHistoryService.add(salesQuota);
-		});
-		
-		salesQuota.setSalesquota(new BigDecimal("9999.9999"));
-		assertDoesNotThrow(()->{
-			salesPersonQuotaHistoryService.add(salesQuota);
-		});
-		
-		salesQuota.setSalesquota(BigDecimal.ZERO);
-		assertDoesNotThrow(()->{
-			salesPersonQuotaHistoryService.add(salesQuota);
-		});
-		
-		salesQuota.setId(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonQuotaHistoryService.add(salesQuota);
-		});
-		
-		salesQuota.setModifieddate(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonQuotaHistoryService.add(salesQuota);
-		});
-		
-		salesQuota.setSalesquota(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonQuotaHistoryService.add(salesQuota);
-		});
-	}
-	
-	@Test
-	void editSalesQuotaHistoryTest() {
-		setUpIdValues();
-		Salespersonquotahistory salesQuota = new Salespersonquotahistory();
-		salesQuota.setId(1234);
-		salesQuota.setModifieddate(Timestamp.valueOf(LocalDateTime.now().plusDays(1)));
-		salesQuota.setSalesquota(BigDecimal.ZERO);
-		assertThrows(InvalidValueException.class, ()->{
-			salesPersonQuotaHistoryService.edit(salesQuota);
-		});
-		salesQuota.setModifieddate(Timestamp.valueOf(LocalDateTime.now()));
-		salesQuota.setSalesquota(new BigDecimal("-0.99"));
-		assertThrows(InvalidValueException.class, ()->{
-			salesPersonQuotaHistoryService.edit(salesQuota);
-		});
-		
-		salesQuota.setSalesquota(new BigDecimal("9999.9999"));
-		assertDoesNotThrow(()->{
-			salesPersonQuotaHistoryService.edit(salesQuota);
-		});
-		
-		salesQuota.setSalesquota(BigDecimal.ZERO);
-		assertDoesNotThrow(()->{
-			salesPersonQuotaHistoryService.edit(salesQuota);
-		});
-		
-		salesQuota.setId(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonQuotaHistoryService.edit(salesQuota);
-		});
-		
-		salesQuota.setModifieddate(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonQuotaHistoryService.edit(salesQuota);
-		});
-		
-		salesQuota.setSalesquota(null);
-		assertThrows(NullPointerException.class, ()->{
-			salesPersonQuotaHistoryService.edit(salesQuota);
-		});
-	}
-	
-	@Test
-	void addSalesTerritoryTest() {
-		Salesterritory salesTerritory = new Salesterritory();
-		salesTerritory.setName("TRSH");
-		salesTerritory.setCountryregioncode("COL");
-		assertThrows(InvalidValueException.class,()->{
-			salesTerritoryService.add(salesTerritory);
-		});
-		
-		salesTerritory.setName("TR-SH");
-		assertDoesNotThrow(()->{
-			salesTerritoryService.add(salesTerritory);
-		});
-		
-		salesTerritory.setName("TR-SHS");
-		assertDoesNotThrow(()->{
-			salesTerritoryService.add(salesTerritory);
-		});
-		
-		salesTerritory.setName(null);
-		assertThrows(NullPointerException.class,()->{
-			salesTerritoryService.add(salesTerritory);
-		});
-		
-		salesTerritory.setCountryregioncode(null);
-		assertThrows(NullPointerException.class,()->{
-			salesTerritoryService.add(salesTerritory);
-		});
-	}
-	
-	@Test
-	void editSalesTerritoryTest() {
-		Salesterritory salesTerritory = new Salesterritory();
-		salesTerritory.setName("TRSH");
-		salesTerritory.setCountryregioncode("COL");
-		assertThrows(InvalidValueException.class,()->{
-			salesTerritoryService.edit(salesTerritory);
-		});
-		
-		salesTerritory.setName("TR-SH");
-		assertDoesNotThrow(()->{
-			salesTerritoryService.edit(salesTerritory);
-		});
-		
-		salesTerritory.setName("TR-SHS");
-		assertDoesNotThrow(()->{
-			salesTerritoryService.edit(salesTerritory);
-		});
-		
-		salesTerritory.setName(null);
-		assertThrows(NullPointerException.class,()->{
-			salesTerritoryService.edit(salesTerritory);
-		});
-		
-		salesTerritory.setCountryregioncode(null);
-		assertThrows(NullPointerException.class,()->{
-			salesTerritoryService.edit(salesTerritory);
-		});
-	}
-	
-	@Test
-	void addSalesTerritoryHistoryTest() {
-		setUpEmptyIdValues();
+	Salesperson setUpLoadSalesPerson(){
 		Optional<Salesterritory> opTerritory = Optional.of(new Salesterritory());
 		when(salesTerritoryRepository.findById(4321)).thenReturn(opTerritory);
-		Salesterritoryhistory salesTerritoryHistory = new Salesterritoryhistory();
-		salesTerritoryHistory.setId(1234);
-		salesTerritoryHistory.setSalesterritory(salesTerritory);
-		salesTerritoryHistory.setEnddate(Timestamp.valueOf(LocalDateTime.now().minusDays(2)));
-		salesTerritoryHistory.setModifieddate(Timestamp.valueOf(LocalDateTime.now().minusDays(1)));
+		Salesperson person = new Salesperson();
+		person.setBusinessentityid(1234);
+		person.setSalesterritory(salesTerritory);
+		person.setSalesquota(new BigDecimal("99999.99999"));
+		person.setCommissionpct(new BigDecimal("0.5"));
 		
-		assertThrows(InvalidValueException.class,()->{
-			salesTerritoryHistoryService.add(salesTerritoryHistory);
-		});
+		return person;
+	}
+	@Test
+	void saveSalesPersonUnderZeroQuotaTest() {
+		setUpEmptyIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setSalesquota(new BigDecimal("-0.9999"));
 		
-		salesTerritoryHistory.setEnddate(Timestamp.valueOf(LocalDateTime.now().plusDays(1)));
-		assertThrows(InvalidValueException.class,()->{
-			salesTerritoryHistoryService.add(salesTerritoryHistory);
-		});
-		
-		salesTerritoryHistory.setEnddate(Timestamp.valueOf(LocalDateTime.now()));
-		salesTerritoryHistory.setModifieddate(Timestamp.valueOf(LocalDateTime.now()));
-		assertThrows(InvalidValueException.class,()->{
-			salesTerritoryHistoryService.add(salesTerritoryHistory);
-		});
-
-		salesTerritoryHistory.setModifieddate(Timestamp.valueOf(LocalDateTime.now().minusDays(1)));
-		assertDoesNotThrow(()->{
-			salesTerritoryHistoryService.add(salesTerritoryHistory);
-		});
-		
-		salesTerritoryHistory.setId(null);
-		assertThrows(NullPointerException.class,()->{
-			salesTerritoryHistoryService.add(salesTerritoryHistory);
-		});
-		
-		salesTerritoryHistory.setSalesterritory(null);
-		assertThrows(NullPointerException.class,()->{
-			salesTerritoryHistoryService.add(salesTerritoryHistory);
-		});
-		
-		salesTerritoryHistory.setEnddate(null);
-		assertThrows(NullPointerException.class,()->{
-			salesTerritoryHistoryService.add(salesTerritoryHistory);
-		});
-		
-		salesTerritoryHistory.setModifieddate(null);
-		assertThrows(NullPointerException.class,()->{
-			salesTerritoryHistoryService.add(salesTerritoryHistory);
+		assertThrows(InvalidValueException.class, ()->{
+			salesPersonService.add(person,1234,4321);
 		});
 	}
 	
 	@Test
-	void editSalesTerritoryHistoryTest() {
+	void saveSalesPersonUnderZeroCommissionTest() {
+		setUpEmptyIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setCommissionpct(new BigDecimal("-0.999"));
+		
+		assertThrows(InvalidValueException.class, ()->{
+			salesPersonService.add(person,1234,4321);
+		});
+	}
+	
+	@Test
+	void saveSalesPersonUpperOneCommisionTest() {
+		setUpEmptyIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setCommissionpct(new BigDecimal("1.001"));
+		
+		assertThrows(InvalidValueException.class, ()->{
+			salesPersonService.add(person,1234,4321);
+		});
+	}
+	
+	@Test
+	void saveSalesPersonCommisionZeroTest(){
+		setUpEmptyIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setCommissionpct(new BigDecimal("0"));
+		assertDoesNotThrow(()->{
+			salesPersonService.add(person,1234,4321);
+		});
+	}
+	
+	@Test
+	void saveSalesPersonCommisionOneTest() {
+		setUpEmptyIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setCommissionpct(new BigDecimal("1"));
+		assertDoesNotThrow(()->{
+			salesPersonService.add(person,1234,4321);
+		});
+	}
+	
+	@Test
+	void saveSalesPersonNullIdTest() {
+		setUpEmptyIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonService.add(person,null,4321);
+		});
+	}
+	
+	@Test
+	void saveSalesPersonNullTerritoryTest() {
+		setUpEmptyIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonService.add(person,1234,null);
+		});
+	}
+	
+	@Test
+	void saveSalesPersonNullQuotaTest() {
+		setUpEmptyIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setSalesquota(null);
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonService.add(person,1234,4321);
+		});
+	}
+	
+	@Test
+	void saveSalesPersonNullComissionTest() {
+		setUpEmptyIdValues();
+		Salesperson person = setUpLoadSalesPerson();;
+		person.setCommissionpct(null);
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonService.add(person,1234,4321);
+		});
+	}
+	
+	@Test
+	void editSalesPersonUnderZeroQuotaTest() {
 		setUpIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setSalesquota(new BigDecimal("-0.9999"));
+		
+		assertThrows(InvalidValueException.class, ()->{
+			salesPersonService.edit(person);
+		});
+	}
+	
+	@Test
+	void editSalesPersonUnderZeroCommissionTest() {
+		setUpIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setCommissionpct(new BigDecimal("-0.999"));
+		
+		assertThrows(InvalidValueException.class, ()->{
+			salesPersonService.edit(person);
+		});
+	}
+	
+	@Test
+	void editSalesPersonUpperOneCommisionTest() {
+		setUpIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setCommissionpct(new BigDecimal("1.001"));
+		
+		assertThrows(InvalidValueException.class, ()->{
+			salesPersonService.edit(person);
+		});
+	}
+	
+	@Test
+	void editSalesPersonCommisionZeroTest(){
+		setUpIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setCommissionpct(new BigDecimal("0"));
+		assertDoesNotThrow(()->{
+			salesPersonService.edit(person);
+		});
+	}
+	
+	@Test
+	void editSalesPersonCommisionOneTest() {
+		setUpIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setCommissionpct(new BigDecimal("1"));
+		assertDoesNotThrow(()->{
+			salesPersonService.edit(person);
+		});
+	}
+	
+	@Test
+	void editSalesPersonNullIdTest() {
+		setUpIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setBusinessentityid(null);
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonService.edit(person);
+		});
+	}
+	
+	@Test
+	void editSalesPersonNullTerritoryTest() {
+		setUpIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setSalesterritory(null);
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonService.edit(person);
+		});
+	}
+	
+	@Test
+	void editSalesPersonNullQuotaTest() {
+		setUpIdValues();
+		Salesperson person = setUpLoadSalesPerson();
+		person.setSalesquota(null);
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonService.edit(person);
+		});
+	}
+	
+	@Test
+	void editSalesPersonNullComissionTest() {
+		setUpIdValues();
+		Salesperson person = setUpLoadSalesPerson();;
+		person.setCommissionpct(null);
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonService.edit(person);
+		});
+	}
+	
+	Salespersonquotahistory setUpSalesQuotaHistory() {
+		Optional<Salesperson> opPerson =  Optional.of(new Salesperson());
+		when(salesPersonRepository.findById(1234)).thenReturn(opPerson);
+		
+		Salespersonquotahistory salesQuota = new Salespersonquotahistory();
+		salesQuota.setId(1234);
+		salesQuota.setModifieddate(Timestamp.valueOf(LocalDateTime.now()));
+		salesQuota.setSalesquota(BigDecimal.ZERO);
+		
+		return salesQuota;
+	}
+	
+	@Test
+	void saveSalesQuotaHistoryAfterTodayModifiedDateTest() {
+		setUpEmptyIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setModifieddate(Timestamp.valueOf(LocalDateTime.now().plusDays(1)));
+		assertThrows(InvalidValueException.class, ()->{
+			salesPersonQuotaHistoryService.add(salesQuota,1234);
+		});
+	}
+	
+	@Test
+	void saveSalesQuotaHistoryQuotaUnderZeroTest() {
+		setUpEmptyIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setSalesquota(new BigDecimal("-0.99"));
+		assertThrows(InvalidValueException.class, ()->{
+			salesPersonQuotaHistoryService.add(salesQuota,1234);
+		});
+	}
+	
+	@Test
+	void saveSalesQuotaHistoryQuotaUpperTest() {
+		setUpEmptyIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setSalesquota(new BigDecimal("9999.9999"));
+		assertDoesNotThrow(()->{
+			salesPersonQuotaHistoryService.add(salesQuota,1234);
+		});
+	}
+	
+	@Test
+	void saveSalesQuotaHistoryQuotaZeroTest() {
+		setUpEmptyIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setSalesquota(BigDecimal.ZERO);
+		assertDoesNotThrow(()->{
+			salesPersonQuotaHistoryService.add(salesQuota,1234);
+		});
+	}
+	
+	@Test
+	void saveSalesQuotaHistoryIdNullTest() {
+		setUpEmptyIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setId(null);
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonQuotaHistoryService.add(salesQuota,1234);
+		});
+	}
+	
+	@Test
+	void saveSalesQuotaHistoryModifiedDateNullTest() {
+		setUpEmptyIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setModifieddate(null);
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonQuotaHistoryService.add(salesQuota,1234);
+		});
+	}
+	
+	@Test
+	void saveSalesQuotaHistoryQuotaNullTest() {
+		setUpEmptyIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setSalesquota(null);
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonQuotaHistoryService.add(salesQuota,1234);
+		});
+	}
+	
+	@Test
+	void editSalesQuotaHistoryAfterTodayModifiedDateTest() {
+		setUpIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setModifieddate(Timestamp.valueOf(LocalDateTime.now().plusDays(1)));
+		assertThrows(InvalidValueException.class, ()->{
+			salesPersonQuotaHistoryService.edit(salesQuota);
+		});
+	}
+	
+	@Test
+	void editSalesQuotaHistoryQuotaUnderZeroTest() {
+		setUpIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setSalesquota(new BigDecimal("-0.99"));
+		assertThrows(InvalidValueException.class, ()->{
+			salesPersonQuotaHistoryService.edit(salesQuota);
+		});
+	}
+	
+	@Test
+	void editSalesQuotaHistoryQuotaUpperTest() {
+		setUpIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setSalesquota(new BigDecimal("9999.9999"));
+		assertDoesNotThrow(()->{
+			salesPersonQuotaHistoryService.edit(salesQuota);
+		});
+	}
+	
+	@Test
+	void editSalesQuotaHistoryQuotaZeroTest() {
+		setUpIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setSalesquota(BigDecimal.ZERO);
+		assertDoesNotThrow(()->{
+			salesPersonQuotaHistoryService.edit(salesQuota);
+		});
+	}
+	
+	@Test
+	void editSalesQuotaHistoryIdNullTest() {
+		setUpIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setId(null);
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonQuotaHistoryService.edit(salesQuota);
+		});
+	}
+	
+	@Test
+	void editSalesQuotaHistoryModifiedDateNullTest() {
+		setUpIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setModifieddate(null);
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonQuotaHistoryService.edit(salesQuota);
+		});
+	}
+	
+	@Test
+	void editSalesQuotaHistoryQuotaNullTest() {
+		setUpIdValues();
+		Salespersonquotahistory salesQuota = setUpSalesQuotaHistory();
+		salesQuota.setSalesquota(null);
+		assertThrows(NullPointerException.class, ()->{
+			salesPersonQuotaHistoryService.edit(salesQuota);
+		});
+	}
+	
+	Salesterritory setUpSalesTerritory() {
+		Salesterritory salesTerritory = new Salesterritory();
+		salesTerritory.setName("TR-SH");
+		salesTerritory.setCountryregioncode("COL");
+		return salesTerritory;
+	}
+	
+	@Test
+	void saveSalesTerritoryShortNameTest() {
+		setUpEmptyIdValues();
+		Salesterritory salesTerritory = setUpSalesTerritory();
+		salesTerritory.setName("TRSH");
+		assertThrows(InvalidValueException.class,()->{
+			salesTerritoryService.add(salesTerritory);
+		});
+	}
+	
+	@Test
+	void saveSalesTerritoryMinLimitSizeNameTest() {
+		setUpEmptyIdValues();
+		Salesterritory salesTerritory = setUpSalesTerritory();
+		salesTerritory.setName("TR-SH");
+		assertDoesNotThrow(()->{
+			salesTerritoryService.add(salesTerritory);
+		});
+	}
+	
+	@Test 
+	void saveSalesTerritoryUpperMinLimitNameTest(){
+		setUpEmptyIdValues();
+		Salesterritory salesTerritory = setUpSalesTerritory();
+		salesTerritory.setName("TR-SHS");
+		assertDoesNotThrow(()->{
+			salesTerritoryService.add(salesTerritory);
+		});
+	}
+	
+	@Test
+	void saveSalesTerritoryNameNullTest() {
+		setUpEmptyIdValues();
+		Salesterritory salesTerritory = setUpSalesTerritory();
+		salesTerritory.setName(null);
+		assertThrows(NullPointerException.class,()->{
+			salesTerritoryService.add(salesTerritory);
+		});
+		
+	}
+	@Test
+	void saveSalesTerritoryCountryCodeNullTest() {
+		setUpEmptyIdValues();
+		Salesterritory salesTerritory = setUpSalesTerritory();
+		salesTerritory.setCountryregioncode(null);
+		assertThrows(NullPointerException.class,()->{
+			salesTerritoryService.add(salesTerritory);
+		});
+	}
+
+	@Test
+	void editSalesTerritoryShortNameTest() {
+		setUpIdValues();
+		Salesterritory salesTerritory = setUpSalesTerritory();
+		salesTerritory.setName("TRSH");
+		salesTerritory.setTerritoryid(4321);
+		assertThrows(InvalidValueException.class,()->{
+			salesTerritoryService.edit(salesTerritory);
+		});
+	}
+	
+	@Test
+	void editSalesTerritoryMinLimitSizeNameTest() {
+		setUpIdValues();
+		Salesterritory salesTerritory = setUpSalesTerritory();
+		salesTerritory.setName("TR-SH");
+		salesTerritory.setTerritoryid(4321);
+		assertDoesNotThrow(()->{
+			salesTerritoryService.edit(salesTerritory);
+		});
+	}
+	
+	@Test 
+	void editSalesTerritoryUpperMinLimitNameTest(){
+		setUpIdValues();
+		Salesterritory salesTerritory = setUpSalesTerritory();
+		salesTerritory.setName("TR-SHS");
+		salesTerritory.setTerritoryid(4321);
+		assertDoesNotThrow(()->{
+			salesTerritoryService.edit(salesTerritory);
+		});
+	}
+	
+	@Test
+	void editSalesTerritoryNameNullTest() {
+		setUpIdValues();
+		Salesterritory salesTerritory = setUpSalesTerritory();
+		salesTerritory.setName(null);
+		assertThrows(NullPointerException.class,()->{
+			salesTerritoryService.edit(salesTerritory);
+		});
+		
+	}
+	@Test
+	void editSalesTerritoryCountryCodeNullTest() {
+		setUpIdValues();
+		Salesterritory salesTerritory = setUpSalesTerritory();
+		salesTerritory.setCountryregioncode(null);
+		assertThrows(NullPointerException.class,()->{
+			salesTerritoryService.edit(salesTerritory);
+		});
+	}
+	
+	Salesterritoryhistory setUpSalesTerritoryHistory() {
+
+		Optional<Salesterritory> opTerritory = Optional.of(new Salesterritory());
+		when(salesTerritoryRepository.findById(4321)).thenReturn(opTerritory);
+		Optional<Salesperson> opPerson =  Optional.of(new Salesperson());
+		when(salesPersonRepository.findById(1234)).thenReturn(opPerson);
 		Salesterritoryhistory salesTerritoryHistory = new Salesterritoryhistory();
 		salesTerritoryHistory.setId(1234);
 		salesTerritoryHistory.setSalesterritory(salesTerritory);
+		salesTerritoryHistory.setEnddate(Timestamp.valueOf(LocalDateTime.now().minusDays(1)));
+		salesTerritoryHistory.setModifieddate(Timestamp.valueOf(LocalDateTime.now().minusDays(2)));
+		
+		return salesTerritoryHistory;
+	}
+	
+	@Test
+	void saveSalesTerritoryHistoryEndDateBeforeStartTest() {
+		setUpEmptyIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
 		salesTerritoryHistory.setEnddate(Timestamp.valueOf(LocalDateTime.now().minusDays(2)));
 		salesTerritoryHistory.setModifieddate(Timestamp.valueOf(LocalDateTime.now().minusDays(1)));
 		
 		assertThrows(InvalidValueException.class,()->{
-			salesTerritoryHistoryService.edit(salesTerritoryHistory);
+			salesTerritoryHistoryService.add(salesTerritoryHistory,1234,4321);
 		});
-		
+	}
+	
+	@Test
+	void saveSalesTerritoryHistoryEndDateAfterNowTest() {
+		setUpEmptyIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
 		salesTerritoryHistory.setEnddate(Timestamp.valueOf(LocalDateTime.now().plusDays(1)));
-		assertThrows(InvalidValueException.class,()->{
-			salesTerritoryHistoryService.edit(salesTerritoryHistory);
-		});
 		
+		assertThrows(InvalidValueException.class,()->{
+			salesTerritoryHistoryService.add(salesTerritoryHistory,1234,4321);
+		});
+	}
+	
+	@Test
+	void saveSalesTerritoryHistoryEqualsDatesTest() {
+		setUpEmptyIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
 		salesTerritoryHistory.setEnddate(Timestamp.valueOf(LocalDateTime.now()));
 		salesTerritoryHistory.setModifieddate(Timestamp.valueOf(LocalDateTime.now()));
 		assertThrows(InvalidValueException.class,()->{
-			salesTerritoryHistoryService.edit(salesTerritoryHistory);
+			salesTerritoryHistoryService.add(salesTerritoryHistory,1234,4321);
+		});
+	}
+	
+	@Test
+	void saveSalesTerritoryHistoryDateModBeforeDateEndTest() {
+		setUpEmptyIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
+		salesTerritoryHistory.setModifieddate(Timestamp.valueOf(LocalDateTime.now().minusDays(2)));
+		assertDoesNotThrow(()->{
+			salesTerritoryHistoryService.add(salesTerritoryHistory,1234,4321);
 		});
 		
-
+	}
+	
+	@Test
+	void saveSalesTerritoryHistoryIdNullTest() {
+		setUpEmptyIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
+		salesTerritoryHistory.setId(null);
+		assertThrows(NullPointerException.class,()->{
+			salesTerritoryHistoryService.add(salesTerritoryHistory,1234,4321);
+		});
+	}
+	
+	@Test
+	void saveSalesTerritoryHistoryTerritoryNullTest() {
+		setUpEmptyIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
+		salesTerritoryHistory.setSalesterritory(null);
+		assertThrows(NullPointerException.class,()->{
+			salesTerritoryHistoryService.add(salesTerritoryHistory,1234,null);
+		});
+	}
+	
+	@Test
+	void saveSalesTerritoryHistoryBusinessIdNullTest() {
+		setUpEmptyIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
+		salesTerritoryHistory.setSalesterritory(null);
+		assertThrows(NullPointerException.class,()->{
+			salesTerritoryHistoryService.add(salesTerritoryHistory,null,4321);
+		});
+	}
+	
+	@Test
+	void saveSalesTerritoryHistoryEndDateNullTest() {
+		setUpEmptyIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
+		salesTerritoryHistory.setEnddate(null);
+		assertThrows(NullPointerException.class,()->{
+			salesTerritoryHistoryService.add(salesTerritoryHistory,1234,4321);
+		});
+	}
+	
+	@Test
+	void saveSalesTerritoryHistoryModDateNullTest() {
+		setUpEmptyIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
+		salesTerritoryHistory.setModifieddate(null);
+		assertThrows(NullPointerException.class,()->{
+			salesTerritoryHistoryService.add(salesTerritoryHistory,1234,4321);
+		});
+	}
+	
+	@Test
+	void editSalesTerritoryHistoryEndDateBeforeStartTest() {
+		setUpIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
+		salesTerritoryHistory.setEnddate(Timestamp.valueOf(LocalDateTime.now().minusDays(2)));
 		salesTerritoryHistory.setModifieddate(Timestamp.valueOf(LocalDateTime.now().minusDays(1)));
+		salesTerritoryHistory.setSalesperson(salesPersonService.findById(1234).get());
+		salesTerritoryHistory.setSalesterritory(salesTerritoryService.findById(4321).get());
+		assertThrows(InvalidValueException.class,()->{
+			salesTerritoryHistoryService.edit(salesTerritoryHistory);
+		});
+	}
+	
+	@Test
+	void editSalesTerritoryHistoryEndDateAfterNowTest() {
+		setUpIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
+		salesTerritoryHistory.setEnddate(Timestamp.valueOf(LocalDateTime.now().plusDays(1)));
+		salesTerritoryHistory.setSalesperson(salesPersonService.findById(1234).get());
+		salesTerritoryHistory.setSalesterritory(salesTerritoryService.findById(4321).get());
+		assertThrows(InvalidValueException.class,()->{
+			salesTerritoryHistoryService.edit(salesTerritoryHistory);
+		});
+	}
+	
+	@Test
+	void editSalesTerritoryHistoryEqualsDatesTest() {
+		setUpIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
+		salesTerritoryHistory.setEnddate(Timestamp.valueOf(LocalDateTime.now()));
+		salesTerritoryHistory.setModifieddate(Timestamp.valueOf(LocalDateTime.now()));
+		salesTerritoryHistory.setSalesperson(salesPersonService.findById(1234).get());
+		salesTerritoryHistory.setSalesterritory(salesTerritoryService.findById(4321).get());
+		assertThrows(InvalidValueException.class,()->{
+			salesTerritoryHistoryService.edit(salesTerritoryHistory);
+		});
+	}
+	
+	@Test
+	void editSalesTerritoryHistoryDateModBeforeDateEndTest() {
+		setUpIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
+		salesTerritoryHistory.setModifieddate(Timestamp.valueOf(LocalDateTime.now().minusDays(2)));
+		salesTerritoryHistory.setSalesperson(salesPersonService.findById(1234).get());
+		salesTerritoryHistory.setSalesterritory(salesTerritoryService.findById(4321).get());
 		assertDoesNotThrow(()->{
 			salesTerritoryHistoryService.edit(salesTerritoryHistory);
 		});
 		
+	}
+	
+	@Test
+	void editSalesTerritoryHistoryIdNullTest() {
+		setUpIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
+		salesTerritoryHistory.setSalesperson(salesPersonService.findById(1234).get());
+		salesTerritoryHistory.setSalesterritory(salesTerritoryService.findById(4321).get());
 		salesTerritoryHistory.setId(null);
 		assertThrows(NullPointerException.class,()->{
 			salesTerritoryHistoryService.edit(salesTerritoryHistory);
 		});
-		
+	}
+	
+	@Test
+	void editSalesTerritoryHistoryTerritoryNullTest() {
+		setUpIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
 		salesTerritoryHistory.setSalesterritory(null);
 		assertThrows(NullPointerException.class,()->{
 			salesTerritoryHistoryService.edit(salesTerritoryHistory);
 		});
-		
+	}
+	
+	@Test
+	void editSalesTerritoryHistoryEndDateNullTest() {
+		setUpIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
 		salesTerritoryHistory.setEnddate(null);
 		assertThrows(NullPointerException.class,()->{
 			salesTerritoryHistoryService.edit(salesTerritoryHistory);
 		});
-		
+	}
+	
+	@Test
+	void editSalesTerritoryHistoryModDateNullTest() {
+		setUpIdValues();
+		Salesterritoryhistory salesTerritoryHistory = setUpSalesTerritoryHistory();
 		salesTerritoryHistory.setModifieddate(null);
 		assertThrows(NullPointerException.class,()->{
 			salesTerritoryHistoryService.edit(salesTerritoryHistory);
 		});
 	}
+
 }

@@ -27,5 +27,13 @@ public class BusinessentityServiceImp implements BusinessentityService {
 	public Optional<Businessentity> findById(Integer id) {
 		return this.businessEntityRepository.findById(id);
 	}
+	@Override
+	public Iterable<Businessentity> findAll() {
+		return this.businessEntityRepository.findAll();
+	}
+	@Override
+	public void clear() {
+		this.businessEntityRepository.deleteAll();
+	}
 
 }

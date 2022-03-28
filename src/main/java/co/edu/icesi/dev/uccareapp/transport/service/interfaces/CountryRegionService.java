@@ -8,4 +8,6 @@ import co.edu.icesi.dev.uccareapp.transport.model.person.Countryregion;
 public interface CountryRegionService {
 	public void add(Countryregion countryRegion);
 	public Optional<Countryregion> findById(String coruntryCode);
+	public Iterable<Countryregion> findAll();
+	public void clear();
 }
